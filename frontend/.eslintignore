@@ -1,0 +1,29 @@
+# Nuxt
+.nuxt
+.output
+dist
+
+# Node modules
+node_modules
+
+# Logs
+*.log*
+
+# System files
+.DS_Store
+
+# Local env files
+.env
+.env.*
+!.env.example
+
+# Lock files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Generated types
+*.d.ts
+
+# Test coverage
+coverage 
