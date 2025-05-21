@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { body } from 'express-validator';
-import { register, login, logout, getSession } from '../controllers/auth.controller';
+import { register, login, logout, getSession, forgotPassword, resetPassword } from '../controllers/auth.controller';
 import { validate } from '../middleware/validate';
 import { authenticate } from '../middleware/auth';
 
@@ -29,6 +29,25 @@ router.post(
     validate
   ],
   login
+);
+
+router.post(
+  '/forgot-password',
+  [
+    body('email').isEmail(),
+    validate
+  ],
+  forgotPassword
+);
+
+router.post(
+  '/reset-password',
+  [
+    body('token').isString(),
+    body('newPassword').isLength({ min: 8 }),
+    validate
+  ],
+  resetPassword
 );
 
 // Protected routes

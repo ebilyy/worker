@@ -42,7 +42,7 @@ export const useAuthStore = defineStore('auth', {
 
       try {
         const { $api } = useNuxtApp()
-        const response = await $api.post<{ user: User; token: string }>('/auth/login', { email, password })
+        const response = await $api.post<{ user: User; token: string }>('/api/auth/login', { email, password })
         this.setUser(response.data.user)
         localStorage.setItem('auth_token', response.data.token)
         return response
@@ -88,7 +88,7 @@ export const useAuthStore = defineStore('auth', {
 
       try {
         const { $api } = useNuxtApp()
-        await $api.post('/auth/logout')
+        await $api.post('/api/auth/logout')
         this.setUser(null)
         localStorage.removeItem('auth_token')
       } catch (error) {
@@ -105,7 +105,7 @@ export const useAuthStore = defineStore('auth', {
 
       try {
         const { $api } = useNuxtApp()
-        const response = await $api.get<{ user: User }>('/auth/session')
+        const response = await $api.get<{ user: User }>('/api/auth/session')
         this.setUser(response.data.user)
         return response.data
       } catch (error) {
@@ -114,6 +114,44 @@ export const useAuthStore = defineStore('auth', {
         if (error instanceof AuthenticationException) {
           throw error
         }
+      } finally {
+        this.setLoading(false)
+      }
+    },
+
+    async requestPasswordReset(email: string) {
+      this.setLoading(true)
+      this.setError(null)
+
+      try {
+        const { $api } = useNuxtApp()
+        await $api.post('/api/auth/forgot-password', { email })
+      } catch (error) {
+        if (error instanceof ValidationException) {
+          this.setError(error.message)
+        } else {
+          this.setError('An error occurred while requesting password reset')
+        }
+        throw error
+      } finally {
+        this.setLoading(false)
+      }
+    },
+
+    async resetPassword(token: string, newPassword: string) {
+      this.setLoading(true)
+      this.setError(null)
+
+      try {
+        const { $api } = useNuxtApp()
+        await $api.post('/api/auth/reset-password', { token, newPassword })
+      } catch (error) {
+        if (error instanceof ValidationException) {
+          this.setError(error.message)
+        } else {
+          this.setError('An error occurred while resetting password')
+        }
+        throw error
       } finally {
         this.setLoading(false)
       }
