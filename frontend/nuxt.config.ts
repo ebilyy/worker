@@ -26,9 +26,13 @@ export default defineNuxtConfig({
   ],
 
   // UI Configuration
+  icon: {
+    serverBundle: {
+      collections: ['uil', 'mdi', 'heroicons'] // <!--- this
+    }
+  },
   ui: {
     global: true,
-    icons: ['heroicons', 'mdi']
   },
 
   // Color Mode Configuration
