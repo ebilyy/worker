@@ -19,6 +19,7 @@ export default defineNuxtConfig({
 
     // State Management
     '@pinia/nuxt',
+    'pinia-plugin-persistedstate/nuxt',
 
     // Development Tools
     '@nuxtjs/eslint-module',
@@ -27,8 +28,15 @@ export default defineNuxtConfig({
 
   // UI Configuration
   icon: {
-    serverBundle: {
-      collections: ['uil', 'mdi', 'heroicons'] // <!--- this
+    provider: 'simple-icons',
+    size: '24px',
+    class: 'icon',
+    iconifyApiOptions: {
+      url: 'https://api.iconify.design',
+    },
+    aliases: {
+      'heroicons': 'heroicons-outline',
+      'heroicons-solid': 'heroicons-solid',
     }
   },
   ui: {
@@ -59,7 +67,7 @@ export default defineNuxtConfig({
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
         {
-          hid: 'description',
+          key: 'description',
           name: 'description',
           content: 'Find your next IT job opportunity in Ukraine and beyond'
         }

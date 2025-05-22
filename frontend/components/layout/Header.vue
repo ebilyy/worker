@@ -42,12 +42,12 @@
             class="p-2 rounded-full text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-200"
             aria-label="Toggle dark mode"
           >
-            <UIcon v-if="colorMode.value === 'dark'" name="i-heroicons-sun" class="w-6 h-6" />
-            <UIcon v-else name="i-heroicons-moon" class="w-6 h-6" />
+            <Icon v-if="colorMode.value === 'dark'" name="heroicons:sun" class="w-6 h-6" />
+            <Icon v-else name="heroicons:moon" class="w-6 h-6" />
           </button>
           
           <!-- Not Authenticated -->
-          <div v-if="!authStore.isAuthenticated" class="ml-6 flex items-center space-x-4">
+          <div v-if="!isUserAuthenticated" class="ml-6 flex items-center space-x-4">
             <NuxtLink 
               to="/auth/login"
               class="text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-200"
@@ -72,10 +72,10 @@
                 variant="ghost"
                 class="flex items-center space-x-2"
               >
-                <span class="hidden md:block">{{ authStore.currentUser?.name }}</span>
+                <span class="hidden md:block">{{ userName }}</span>
                 <UAvatar
-                  :src="authStore.currentUser?.avatar_url || undefined"
-                  :text="!authStore.currentUser?.avatar_url ? userInitials : undefined"
+                  :src="userAvatarUrl"
+                  :text="!userAvatarUrl ? userInitials : undefined"
                   size="sm"
                   color="primary"
                 />
@@ -93,8 +93,8 @@
             class="inline-flex items-center justify-center p-2 rounded-md"
             aria-expanded="false"
           >
-            <UIcon v-if="!isMobileMenuOpen" name="i-heroicons-bars-3" class="block h-6 w-6" />
-            <UIcon v-else name="i-heroicons-x-mark" class="block h-6 w-6" />
+            <Icon v-if="!isMobileMenuOpen" name="heroicons:bars-3" class="block h-6 w-6" />
+            <Icon v-else name="heroicons:x-mark" class="block h-6 w-6" />
           </UButton>
         </div>
       </div>
@@ -129,7 +129,7 @@
         </NuxtLink>
         
         <!-- Authentication Links for Mobile -->
-        <template v-if="!authStore.isAuthenticated">
+        <template v-if="!isUserAuthenticated">
           <NuxtLink
             to="/auth/login"
             class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900/20"
@@ -184,6 +184,21 @@ const isMobileMenuOpen = ref(false)
 const { y } = useWindowScroll()
 const scrolled = computed(() => y.value > 0)
 
+// Authentication-related computed properties
+const isUserAuthenticated = computed(() => {
+  return !!authStore.isAuthenticated
+})
+
+const userName = computed(() => {
+  const user = authStore.currentUser
+  if (!user) return ''
+  return `${user.firstName} ${user.lastName}`
+})
+
+const userAvatarUrl = computed(() => {
+  return authStore.currentUser?.avatar_url || undefined
+})
+
 // Toggle color mode
 const toggleColorMode = () => {
   colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
@@ -191,14 +206,11 @@ const toggleColorMode = () => {
 
 // Generate user initials for the avatar
 const userInitials = computed(() => {
-  if (!authStore.currentUser) return ''
+  const user = authStore.currentUser
+  if (!user) return ''
   
-  // Split the name into parts and use the first character of each part
-  const nameParts = authStore.currentUser.name.split(' ')
-  if (nameParts.length >= 2) {
-    return `${nameParts[0].charAt(0)}${nameParts[1].charAt(0)}`
-  }
-  return nameParts[0].charAt(0)
+  // Get initials from first and last name
+  return `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`
 })
 
 // User dropdown menu items
@@ -206,19 +218,19 @@ const userMenuItems = computed(() => [
   [
     {
       label: 'Dashboard',
-      icon: 'i-heroicons-squares-2x2',
+      icon: 'heroicons:squares-2x2',
       to: '/dashboard'
     },
     {
       label: 'Profile',
-      icon: 'i-heroicons-user',
+      icon: 'heroicons:user',
       to: '/profile'
     }
   ],
   [
     {
       label: 'Logout',
-      icon: 'i-heroicons-arrow-right-on-rectangle',
+      icon: 'heroicons:arrow-right-on-rectangle',
       click: handleLogout
     }
   ]
